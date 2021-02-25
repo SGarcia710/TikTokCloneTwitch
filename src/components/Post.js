@@ -1,5 +1,14 @@
-import React from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import React, {useRef, useEffect, useCallback, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Animated,
+  Easing,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import Video from 'react-native-video';
 import Foundation from 'react-native-vector-icons/Foundation';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -8,17 +17,47 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const Post = () => {
+  const spinValue = useRef(new Animated.Value(0)).current;
+  const [paused, setPaused] = useState(false);
+
+  const animateDisc = useCallback(() => {
+    Animated.loop(
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 3000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ).start();
+  }, []);
+
+  useEffect(() => {
+    animateDisc();
+  }, []);
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
   return (
     <View style={styles.container}>
-      <Video
-        style={styles.video}
-        resizeMode="cover"
-        source={{
-          uri:
-            'https://res.cloudinary.com/sgarciacloud/video/upload/v1614154462/pexels-kira-schwarz-6868682_x2krnp.mp4',
-        }}
-        repeat
-      />
+      <TouchableWithoutFeedback
+        onPress={() => {
+          setPaused(!paused);
+        }}>
+        <Video
+          paused={paused}
+          style={styles.video}
+          resizeMode="cover"
+          source={{
+            uri:
+              'https://res.cloudinary.com/sgarciacloud/video/upload/v1614154462/pexels-kira-schwarz-6868682_x2krnp.mp4',
+          }}
+          repeat
+        />
+      </TouchableWithoutFeedback>
+
       <View style={styles.sideContainer}>
         <TouchableOpacity style={styles.avatarContainer}>
           <Image
@@ -47,12 +86,30 @@ const Post = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.bottomContainer}>
-        <Text style={styles.username}>@sgarcia</Text>
-        <Text style={styles.description}>Hello there</Text>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Foundation name="music" size={15} color="#fff" />
-          <Text style={styles.songName}>Phoenix - 1901</Text>
+        <View>
+          <Text style={styles.username}>@sgarcia</Text>
+          <Text style={styles.description}>Hello there</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Foundation name="music" size={15} color="#fff" />
+            <Text style={styles.songName}>Phoenix - 1901</Text>
+          </View>
         </View>
+        <Animated.View
+          style={[
+            styles.songCoverContainer,
+            {
+              transform: [{rotate: spin}],
+            },
+          ]}>
+          <Image source={require('../assets/images/disc.png')} />
+          <Image
+            style={styles.songConverImage}
+            source={{
+              uri:
+                'https://upload.wikimedia.org/wikipedia/en/thumb/f/f9/Phoenix_-_1901.jpeg/220px-Phoenix_-_1901.jpeg',
+            }}
+          />
+        </Animated.View>
       </View>
     </View>
   );
@@ -75,6 +132,9 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingBottom: 10,
     paddingHorizontal: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
   },
   username: {
     fontSize: 17,
@@ -108,7 +168,7 @@ const styles = StyleSheet.create({
   plusIcon: {
     width: 21,
     height: 21,
-    borderRadius: 21,
+    borderRadius: 21 / 2,
     backgroundColor: '#EA4359',
     justifyContent: 'center',
     alignItems: 'center',
@@ -123,6 +183,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     marginTop: 5.27,
+  },
+  songCoverContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  songConverImage: {
+    width: 27,
+    height: 27,
+    borderRadius: 27 / 2,
+    position: 'absolute',
   },
 });
 
