@@ -15,6 +15,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import TextTicker from 'react-native-text-ticker';
 
 const Post = () => {
   const spinValue = useRef(new Animated.Value(0)).current;
@@ -89,9 +90,24 @@ const Post = () => {
         <View>
           <Text style={styles.username}>@sgarcia</Text>
           <Text style={styles.description}>Hello there</Text>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Foundation name="music" size={15} color="#fff" />
-            <Text style={styles.songName}>Phoenix - 1901</Text>
+          <View
+            style={{flexDirection: 'row', alignItems: 'center', width: 165}}>
+            <Foundation
+              style={{marginRight: 9}}
+              name="music"
+              size={15}
+              color="#fff"
+            />
+            <TextTicker
+              style={styles.songName}
+              duration={3000}
+              loop
+              bounce={false}
+              easing={Easing.linear}
+              repeatSpacer={15}
+              useNativeDriver={true}>
+              Phoenixasdasdasd - 1901123123
+            </TextTicker>
           </View>
         </View>
         <Animated.View
@@ -152,7 +168,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '300',
     color: '#fff',
-    marginLeft: 9,
   },
   avatarContainer: {
     alignItems: 'center',
