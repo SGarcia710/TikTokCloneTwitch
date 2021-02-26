@@ -8,6 +8,7 @@ import {
   Animated,
   Easing,
   TouchableWithoutFeedback,
+  Dimensions,
 } from 'react-native';
 import Video from 'react-native-video';
 import Foundation from 'react-native-vector-icons/Foundation';
@@ -17,9 +18,19 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import TextTicker from 'react-native-text-ticker';
 
-const Post = () => {
+const Post = ({
+  liked,
+  commentsCount,
+  description,
+  likesCount,
+  song,
+  user,
+  videoUrl,
+}) => {
   const spinValue = useRef(new Animated.Value(0)).current;
   const [paused, setPaused] = useState(false);
+  const [isLiked, setIsLiked] = useState(liked);
+  const [likes, setLikes] = useState(likesCount);
 
   const animateDisc = useCallback(() => {
     Animated.loop(
@@ -52,8 +63,7 @@ const Post = () => {
           style={styles.video}
           resizeMode="cover"
           source={{
-            uri:
-              'https://res.cloudinary.com/sgarciacloud/video/upload/v1614154462/pexels-kira-schwarz-6868682_x2krnp.mp4',
+            uri: videoUrl,
           }}
           repeat
         />
@@ -64,8 +74,7 @@ const Post = () => {
           <Image
             style={styles.avatar}
             source={{
-              uri:
-                'https://res.cloudinary.com/sgarciacloud/image/upload/v1614154654/pexels-masha-raymers-4935657_zaxdhj.jpg',
+              uri: user.avatarUrl,
             }}
           />
           <View style={styles.plusIcon}>
@@ -73,13 +82,26 @@ const Post = () => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionContainer}>
-          <MaterialCommunityIcons name="heart" size={35} color="white" />
-          <Text style={styles.actionLabel}>328.7k</Text>
+        <TouchableOpacity
+          onPress={() => {
+            if (isLiked) {
+              setLikes(likes - 1);
+            } else {
+              setLikes(likes + 1);
+            }
+            setIsLiked(!isLiked);
+          }}
+          style={styles.actionContainer}>
+          <MaterialCommunityIcons
+            name="heart"
+            size={35}
+            color={isLiked === true ? '#EA4359' : 'white'}
+          />
+          <Text style={styles.actionLabel}>{likes}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionContainer}>
           <FontAwesome name="commenting" size={35} color="white" />
-          <Text style={styles.actionLabel}>342</Text>
+          <Text style={styles.actionLabel}>{commentsCount}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionContainer}>
           <Fontisto name="share-a" size={35} color="white" />
@@ -88,8 +110,8 @@ const Post = () => {
       </View>
       <View style={styles.bottomContainer}>
         <View>
-          <Text style={styles.username}>@sgarcia</Text>
-          <Text style={styles.description}>Hello there</Text>
+          <Text style={styles.username}>@{user.username}</Text>
+          <Text style={styles.description}>{description}</Text>
           <View
             style={{flexDirection: 'row', alignItems: 'center', width: 165}}>
             <Foundation
@@ -106,7 +128,7 @@ const Post = () => {
               easing={Easing.linear}
               repeatSpacer={15}
               useNativeDriver={true}>
-              Phoenixasdasdasd - 1901123123
+              {song.name}
             </TextTicker>
           </View>
         </View>
@@ -121,8 +143,7 @@ const Post = () => {
           <Image
             style={styles.songConverImage}
             source={{
-              uri:
-                'https://upload.wikimedia.org/wikipedia/en/thumb/f/f9/Phoenix_-_1901.jpeg/220px-Phoenix_-_1901.jpeg',
+              uri: song.coverUrl,
             }}
           />
         </Animated.View>
@@ -133,8 +154,8 @@ const Post = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    height: '100%',
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
     justifyContent: 'flex-end',
   },
   video: {
